@@ -1,35 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { CanceledError, AxiosError } from "axios";
+import { useState, useEffect } from "react";
+import { userService, type User } from "./services/user-service";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const { request, cancel } = userService.getAll();
+
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        const res = await request;
+        setUsers(res.data);
+      } catch (err) {
+        if (err instanceof CanceledError) return;
+        setError((err as AxiosError).message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+    return () => cancel();
+  }, []);
+
+  // Professional Tip: Optimistic UI Updates
+  const deleteUser = (user: User) => {
+    const originalUsers = [...users];
+    setUsers(users.filter((u) => u.id !== user.id));
+
+    // Here you would call userService.delete(user.id)
+    // .catch(() => { setError("Delete failed"); setUsers(originalUsers); })
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <div className="container">
+      {/* 1. Error Message Display */}
+      {error && <p className="text-danger">{error}</p>}
+
+      {/* 2. Loading Spinner */}
+      {isLoading && <div className="spinner">Loading users...</div>}
+
+      <h1>User Management</h1>
+
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button
+          onClick={() => {
+            /* Logic to add user */
+          }}
+          className="btn-primary"
+        >
+          Add User
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+        {/* 3. Data Rendering with professional checks */}
+        <ul className="list-group">
+          {users.map((user: User) => (
+            <li key={user.id} className="list-item">
+              <span>{user.name}</span>
+              <button
+                onClick={() => deleteUser(user)}
+                className="btn-outline-danger"
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        {users.length === 0 && !isLoading && !error && (
+          <p>No users found in the database.</p>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
