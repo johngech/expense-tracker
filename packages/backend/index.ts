@@ -1,24 +1,18 @@
 import express from "express";
-import type { Request, Response } from "express";
 import dotenv from "dotenv";
+import { UserService, ExpenseService } from "./services";
+import { ExpenseController, UserController } from "./controllers";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-app.get("/api", (request: Request, response: Response) => {
-  response.send({
-    message: "Hello world!",
-  });
-});
+const userController = new UserController(new UserService(), app);
+userController.registerRoutes();
 
-app.get("/api/users", (request: Request, response: Response) => {
-  response.send([
-    { id: 1, name: "John" },
-    { id: 2, name: "Dereje" },
-  ]);
-});
+const expenseController = new ExpenseController(new ExpenseService(), app);
+expenseController.registerRoutes();
 
 const port = process.env.PORT ?? 3000;
 
