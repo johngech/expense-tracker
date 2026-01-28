@@ -1,10 +1,10 @@
 import { ExpenseService, type ExpenseDto } from "../services";
-import type { Request, Response, Express } from "express";
+import type { Request, Response, Router } from "express";
 
 export class ExpenseController {
   public constructor(
     private readonly expenseService: ExpenseService,
-    private readonly app: Express,
+    private readonly app: Router,
   ) {}
 
   public registerRoutes() {

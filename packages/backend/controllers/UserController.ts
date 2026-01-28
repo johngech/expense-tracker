@@ -1,10 +1,10 @@
 import { type UserDto, UserService } from "../services";
-import type { Express, Request, Response } from "express";
+import type { Request, Response, Router } from "express";
 
 export class UserController {
   public constructor(
     private readonly userService: UserService,
-    private readonly app: Express,
+    private readonly app: Router,
   ) {}
 
   public registerRoutes() {

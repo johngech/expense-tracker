@@ -12,7 +12,9 @@ export interface ExpenseDto {
 }
 
 export class ExpenseService {
-  private prisma = PrismaService.getClient();
+  private get prisma() {
+    return PrismaService.getClient();
+  }
 
   public async getAll(): Promise<Expense[]> {
     return this.prisma.expense.findMany({

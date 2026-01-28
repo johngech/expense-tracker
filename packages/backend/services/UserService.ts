@@ -8,24 +8,51 @@ export interface UserDto {
   password: string;
 }
 
-export class UserService {
-  private prisma = PrismaService.getClient();
+interface UserResponseDto {
+  id: number;
+  name: string;
+  email: string;
+  createdAt: Date;
+}
 
-  public async getAll(): Promise<User[]> {
+export class UserService {
+  private get prisma() {
+    return PrismaService.getClient();
+  }
+
+  public async getAll(): Promise<UserResponseDto[]> {
     return this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  public async getById(userId: number): Promise<User | null> {
+  public async getById(userId: number): Promise<UserResponseDto | null> {
     return this.prisma.user.findUnique({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
       where: { id: userId },
     });
   }
 
-  public async register(data: UserDto): Promise<User> {
+  public async register(data: UserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
       data: {
         name: data.name,
         email: data.email,
@@ -37,12 +64,19 @@ export class UserService {
   public async update(
     userId: number,
     data: Partial<Pick<User, "name" | "email">>,
-  ): Promise<User> {
+  ): Promise<UserResponseDto> {
     return this.prisma.user.update({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
       where: { id: userId },
       data,
     });
   }
+
   public async delete(userId: number): Promise<void> {
     this.prisma.user.delete({
       where: { id: userId },

@@ -14,6 +14,8 @@ model User {
   createdAt DateTime  @default(now())
 
   expenses  Expense[]
+
+  @@map("users")
 }
 
 model Expense {
@@ -29,4 +31,6 @@ model Expense {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+
+  @@map("expenses")
 }
