@@ -79,7 +79,7 @@ export class UserService {
   }
 
   public async delete(userId: number): Promise<void> {
-    this.prisma.user.delete({
+    await this.prisma.user.delete({
       where: { id: userId },
     });
   }

@@ -1,3 +1,4 @@
+import { AuthMiddleware, ExpenseOwnershipMiddleware } from "../middleware";
 import { ExpenseService, type ExpenseDto } from "../services";
 import type { Request, Response, Router } from "express";
 
@@ -10,9 +11,19 @@ export class ExpenseController {
   public registerRoutes() {
     this.app.get("/expenses", this.getAll);
     this.app.get("/expenses/:id", this.getById);
-    this.app.post("/expenses", this.create);
-    this.app.patch("/expenses/:id", this.update);
-    this.app.delete("/expenses/:id", this.delete);
+    this.app.post("/expenses", AuthMiddleware.handle, this.create);
+    this.app.patch(
+      "/expenses/:id",
+      AuthMiddleware.handle,
+      ExpenseOwnershipMiddleware.handle,
+      this.update,
+    );
+    this.app.delete(
+      "/expenses/:id",
+      AuthMiddleware.handle,
+      ExpenseOwnershipMiddleware.handle,
+      this.delete,
+    );
   }
 
   private getAll = async (request: Request, response: Response) => {
@@ -49,7 +60,7 @@ export class ExpenseController {
 
   private delete = async (request: Request, response: Response) => {
     const expenseId = Number(request.params.id);
-    this.expenseService.getById(expenseId);
+    await this.expenseService.getById(expenseId);
     response.status(204).send();
   };
 }

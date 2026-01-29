@@ -52,6 +52,6 @@ export class ExpenseService {
   }
 
   public async delete(id: number): Promise<void> {
-    this.prisma.expense.delete({ where: { id: id } });
+    await this.prisma.expense.delete({ where: { id: id } });
   }
 }

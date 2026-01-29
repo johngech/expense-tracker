@@ -1,7 +1,7 @@
 import type { Router, Request, Response } from "express";
-import type { AuthService } from "../services";
-import { JwtService } from "../services/JwtService";
+import { AuthService, JwtService } from "../services";
 import { AuthMiddleware } from "../middleware";
+import { assertAuthRequest } from "../middleware/assertAuth";
 
 export class AuthController {
   public constructor(
@@ -54,15 +54,9 @@ export class AuthController {
 
   private me = async (request: Request, response: Response) => {
     try {
-      const authHeader = request.headers.authorization;
-      if (!authHeader?.startsWith("Bearer ")) {
-        throw new Error("Missing or invalid authorization header");
-      }
-      const token = authHeader.replace("Bearer ", "");
-
-      const decoded = JwtService.verifyToken(token, "access");
-
-      const user = await this.authService.getProfile(decoded.userId);
+      assertAuthRequest(request);
+      const userId = request.user.userId;
+      const user = await this.authService.getProfile(userId);
 
       response.json(user);
     } catch (e: any) {

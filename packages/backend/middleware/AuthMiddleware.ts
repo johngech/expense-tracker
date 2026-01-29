@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { JwtService } from "../services";
+import type { AuthRequest } from "../types";
 
 export class AuthMiddleware {
   public static handle = (
@@ -22,7 +23,7 @@ export class AuthMiddleware {
       const decoded = JwtService.verifyToken(token, "access");
 
       // Attach claims to request
-      (request as any).user = decoded;
+      (request as AuthRequest).user = decoded;
 
       next();
     } catch (error: any) {

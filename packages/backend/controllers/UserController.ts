@@ -1,3 +1,4 @@
+import { AuthMiddleware, UserOwnershipMiddleware } from "../middleware";
 import { type UserDto, UserService } from "../services";
 import type { Request, Response, Router } from "express";
 
@@ -8,11 +9,21 @@ export class UserController {
   ) {}
 
   public registerRoutes() {
-    this.app.get("/users", this.getAll);
-    this.app.get("/users/:id", this.getById);
+    this.app.get("/users", AuthMiddleware.handle, this.getAll);
+    this.app.get("/users/:id", AuthMiddleware.handle, this.getById);
     this.app.post("/users", this.create);
-    this.app.patch("/users/:id", this.update);
-    this.app.delete("/users/:id", this.delete);
+    this.app.patch(
+      "/users/:id",
+      AuthMiddleware.handle,
+      UserOwnershipMiddleware.handle,
+      this.update,
+    );
+    this.app.delete(
+      "/users/:id",
+      AuthMiddleware.handle,
+      UserOwnershipMiddleware.handle,
+      this.delete,
+    );
   }
 
   private getAll = async (request: Request, response: Response) => {
@@ -49,7 +60,7 @@ export class UserController {
 
   private delete = async (request: Request, response: Response) => {
     const userId = Number(request.params.id);
-    this.userService.getById(userId);
+    await this.userService.delete(userId);
     response.status(204).send();
   };
 }
