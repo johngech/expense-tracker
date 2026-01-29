@@ -1,4 +1,9 @@
-import { AuthMiddleware, UserOwnershipMiddleware } from "../middleware";
+import {
+  AuthMiddleware,
+  UserOwnershipMiddleware,
+  validateBodyMiddleware,
+} from "../middleware";
+import { CreateUserSchema, UpdateUserSchema } from "../schemas";
 import { type UserDto, UserService } from "../services";
 import type { Request, Response, Router } from "express";
 
@@ -11,9 +16,14 @@ export class UserController {
   public registerRoutes() {
     this.app.get("/users", AuthMiddleware.handle, this.getAll);
     this.app.get("/users/:id", AuthMiddleware.handle, this.getById);
-    this.app.post("/users", this.create);
+    this.app.post(
+      "/users",
+      validateBodyMiddleware(CreateUserSchema),
+      this.create,
+    );
     this.app.patch(
       "/users/:id",
+      validateBodyMiddleware(UpdateUserSchema),
       AuthMiddleware.handle,
       UserOwnershipMiddleware.handle,
       this.update,

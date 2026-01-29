@@ -17,8 +17,8 @@ export class JwtService {
     const options: SignOptions = {
       expiresIn:
         claims.type == "access"
-          ? jwtConfig.accessTokenExpiration * 1000
-          : jwtConfig.refreshTokenExpiration * 1000,
+          ? jwtConfig.accessTokenExpiration
+          : jwtConfig.refreshTokenExpiration,
     };
     return jwt.sign(claims, this.SECRET, options);
   }

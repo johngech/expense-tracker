@@ -1,4 +1,9 @@
-import { AuthMiddleware, ExpenseOwnershipMiddleware } from "../middleware";
+import {
+  AuthMiddleware,
+  ExpenseOwnershipMiddleware,
+  validateBodyMiddleware,
+} from "../middleware";
+import { CreateExpenseSchema, UpdateExpenseSchema } from "../schemas";
 import { ExpenseService, type ExpenseDto } from "../services";
 import type { Request, Response, Router } from "express";
 
@@ -11,9 +16,15 @@ export class ExpenseController {
   public registerRoutes() {
     this.app.get("/expenses", this.getAll);
     this.app.get("/expenses/:id", this.getById);
-    this.app.post("/expenses", AuthMiddleware.handle, this.create);
+    this.app.post(
+      "/expenses",
+      validateBodyMiddleware(CreateExpenseSchema),
+      AuthMiddleware.handle,
+      this.create,
+    );
     this.app.patch(
       "/expenses/:id",
+      validateBodyMiddleware(UpdateExpenseSchema),
       AuthMiddleware.handle,
       ExpenseOwnershipMiddleware.handle,
       this.update,

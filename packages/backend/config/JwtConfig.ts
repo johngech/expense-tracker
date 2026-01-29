@@ -1,9 +1,10 @@
 import { envConfig } from "./envConfig";
+import type { StringValue } from "ms";
 
 export class JwtConfig {
   public readonly jwtSecret: string;
-  public readonly accessTokenExpiration: number;
-  public readonly refreshTokenExpiration: number;
+  public readonly accessTokenExpiration: StringValue;
+  public readonly refreshTokenExpiration: StringValue;
 
   constructor() {
     this.jwtSecret = envConfig.jwt.jwtSecret;

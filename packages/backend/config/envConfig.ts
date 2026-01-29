@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-
+import type { StringValue } from "ms";
 dotenv.config();
 
 function loadEnv(key: string): string {
@@ -14,8 +14,8 @@ export const envConfig = {
 
   jwt: {
     jwtSecret: loadEnv("JWT_SECRET"),
-    accessTokenExpiration: Number(loadEnv("ACCESS_TOKEN_EXPIRATION")), // in ms
-    refreshTokenExpiration: Number(loadEnv("REFRESH_TOKEN_EXPIRATION")), // in ms
+    accessTokenExpiration: loadEnv("ACCESS_TOKEN_EXPIRATION") as StringValue,
+    refreshTokenExpiration: loadEnv("REFRESH_TOKEN_EXPIRATION") as StringValue,
   },
 
   database: {

@@ -1,7 +1,8 @@
 import type { Router, Request, Response } from "express";
 import { AuthService, JwtService } from "../services";
-import { AuthMiddleware } from "../middleware";
+import { AuthMiddleware, validateBodyMiddleware } from "../middleware";
 import { assertAuthRequest } from "../middleware/assertAuth";
+import { LoginSchema } from "../schemas";
 
 export class AuthController {
   public constructor(
@@ -10,7 +11,11 @@ export class AuthController {
   ) {}
 
   public registerRoutes() {
-    this.router.post("/auth/login", this.login);
+    this.router.post(
+      "/auth/login",
+      validateBodyMiddleware(LoginSchema),
+      this.login,
+    );
     this.router.post("/auth/refresh", this.refresh);
     this.router.get("/auth/me", AuthMiddleware.handle, this.me); // filter the incoming request
   }
