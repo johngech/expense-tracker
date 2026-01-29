@@ -11,6 +11,7 @@ function loadEnv(key: string): string {
 export const envConfig = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   port: Number(process.env.PORT ?? 3000),
+  frontendUrl: loadEnv("FRONTEND_URL"),
 
   jwt: {
     jwtSecret: loadEnv("JWT_SECRET"),

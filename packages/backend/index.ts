@@ -1,4 +1,6 @@
 import express, { Router } from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import { envConfig } from "./config/envConfig";
 import { UserService, ExpenseService, AuthService } from "./services";
 import {
@@ -6,7 +8,6 @@ import {
   ExpenseController,
   UserController,
 } from "./controllers";
-import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./middleware";
 
 const port = envConfig.port;
@@ -14,6 +15,19 @@ const port = envConfig.port;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
+// CORS config
+const corsOptions: cors.CorsOptions = {
+  origin:
+    envConfig.nodeEnv === "development"
+      ? ["http://localhost:5173"]
+      : [envConfig.frontendUrl],
+  credentials: true, // allow cookies (for refresh tokens)
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 
 const apiRouter = Router();
 
