@@ -18,10 +18,7 @@ app.use(cookieParser());
 
 // CORS config
 const corsOptions: cors.CorsOptions = {
-  origin:
-    envConfig.nodeEnv === "development"
-      ? ["http://localhost:5173"]
-      : [envConfig.frontendUrl],
+  origin: [envConfig.frontendUrl],
   credentials: true, // allow cookies (for refresh tokens)
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
