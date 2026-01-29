@@ -1,5 +1,6 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { UnauthorizedError } from "../errors";
+import { jwtConfig } from "../config/JwtConfig";
 
 export type TokenType = "access" | "refresh";
 
@@ -10,11 +11,14 @@ interface Claims {
 }
 
 export class JwtService {
-  private static readonly SECRET = process.env.JWT_SECRET!;
+  private static readonly SECRET = jwtConfig.jwtSecret;
 
   private static generateToken(claims: Claims): string {
     const options: SignOptions = {
-      expiresIn: claims.type == "access" ? "15m" : "7d",
+      expiresIn:
+        claims.type == "access"
+          ? jwtConfig.accessTokenExpiration * 1000
+          : jwtConfig.refreshTokenExpiration * 1000,
     };
     return jwt.sign(claims, this.SECRET, options);
   }

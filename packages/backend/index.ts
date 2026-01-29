@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import dotenv from "dotenv";
+import { envConfig } from "./config/envConfig";
 import { UserService, ExpenseService, AuthService } from "./services";
 import {
   AuthController,
@@ -9,7 +9,7 @@ import {
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./middleware";
 
-dotenv.config();
+const port = envConfig.port;
 
 const app = express();
 app.use(express.json());
@@ -32,8 +32,6 @@ expenseController.registerRoutes();
 app.use("/api", apiRouter);
 
 app.use(errorMiddleware);
-
-const port = process.env.PORT ?? 3000;
 
 app.listen(port, () => {
   console.log(`The web server is listening on http://localhost:${port}`);
