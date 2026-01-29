@@ -1,6 +1,7 @@
 import type { User } from "@prisma/client";
 import { PrismaService } from "./PrismaService";
 import bcrypt from "bcrypt";
+import type { LoginRequest } from "./AuthService";
 
 export interface UserDto {
   name: string;
@@ -80,6 +81,12 @@ export class UserService {
   public async delete(userId: number): Promise<void> {
     this.prisma.user.delete({
       where: { id: userId },
+    });
+  }
+
+  public async findByEmail(email: string): Promise<User | null> {
+    return await this.prisma.user.findUnique({
+      where: { email: email },
     });
   }
 }
