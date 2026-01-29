@@ -1,7 +1,7 @@
-import type { User } from "@prisma/client";
-import { PrismaService } from "./PrismaService";
 import bcrypt from "bcrypt";
-import type { LoginRequest } from "./AuthService";
+import type { User } from "@prisma/client";
+import { PrismaService } from "./";
+import { BadRequestError, NotFoundError } from "../errors";
 
 export interface UserDto {
   name: string;
@@ -33,8 +33,8 @@ export class UserService {
     });
   }
 
-  public async getById(userId: number): Promise<UserResponseDto | null> {
-    return this.prisma.user.findUnique({
+  public async getById(userId: number): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findUnique({
       select: {
         id: true,
         name: true,
@@ -43,11 +43,15 @@ export class UserService {
       },
       where: { id: userId },
     });
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+    return user;
   }
 
   public async register(data: UserDto): Promise<UserResponseDto> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       select: {
         id: true,
         name: true,
@@ -60,13 +64,17 @@ export class UserService {
         password: hashedPassword,
       },
     });
+    if (!user) {
+      throw new BadRequestError();
+    }
+    return user;
   }
 
   public async update(
     userId: number,
     data: Partial<Pick<User, "name" | "email">>,
   ): Promise<UserResponseDto> {
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       select: {
         id: true,
         name: true,
@@ -76,17 +84,29 @@ export class UserService {
       where: { id: userId },
       data,
     });
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+    return user;
   }
 
   public async delete(userId: number): Promise<void> {
+    const user = await this.getById(userId);
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
     await this.prisma.user.delete({
       where: { id: userId },
     });
   }
 
-  public async findByEmail(email: string): Promise<User | null> {
-    return await this.prisma.user.findUnique({
+  public async findByEmail(email: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
       where: { email: email },
     });
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+    return user;
   }
 }

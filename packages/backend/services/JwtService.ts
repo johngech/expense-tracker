@@ -1,4 +1,5 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
+import { UnauthorizedError } from "../errors";
 
 export type TokenType = "access" | "refresh";
 
@@ -21,15 +22,16 @@ export class JwtService {
   public static verifyToken(token: string, expectedType: TokenType) {
     try {
       const decoded = jwt.verify(token, this.SECRET) as Claims;
-      if (decoded.type !== expectedType) throw new Error("Invalid token type");
+      if (decoded.type !== expectedType)
+        throw new UnauthorizedError("Invalid token type");
       return decoded;
     } catch (error: any) {
       const message =
         error.name === "TokenExpiredError" ? "Expired" : "Invalid";
-      throw new Error(`${message} ${expectedType} token`);
+      throw new UnauthorizedError(`${message} ${expectedType} token`);
     }
   }
-  
+
   public static generateAccessToken(userId: number, email?: string): string {
     return this.generateToken({ userId: userId, email: email, type: "access" });
   }

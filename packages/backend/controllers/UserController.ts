@@ -34,10 +34,6 @@ export class UserController {
   private getById = async (request: Request, response: Response) => {
     const userId = Number(request.params.id);
     const user = await this.userService.getById(userId);
-    if (!user) {
-      response.status(404).send({ error: "User not found" });
-      return;
-    }
     response.status(200).send(user);
   };
 
@@ -51,10 +47,6 @@ export class UserController {
     const userId = Number(request.params.id);
     const userData = request.body;
     const user = await this.userService.update(userId, userData);
-    if (!user) {
-      response.status(404).send({ error: "User not found" });
-      return;
-    }
     response.status(200).send(user);
   };
 

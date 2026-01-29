@@ -7,6 +7,7 @@ import {
   UserController,
 } from "./controllers";
 import cookieParser from "cookie-parser";
+import { errorMiddleware } from "./middleware";
 
 dotenv.config();
 
@@ -29,6 +30,9 @@ const expenseController = new ExpenseController(
 expenseController.registerRoutes();
 
 app.use("/api", apiRouter);
+
+app.use(errorMiddleware);
+
 const port = process.env.PORT ?? 3000;
 
 app.listen(port, () => {

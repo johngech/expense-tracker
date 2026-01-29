@@ -34,10 +34,6 @@ export class ExpenseController {
   private getById = async (request: Request, response: Response) => {
     const expenseId = Number(request.params.id);
     const expense = await this.expenseService.getById(expenseId);
-    if (!expense) {
-      response.status(404).send({ error: "Expense not found" });
-      return;
-    }
     response.status(200).send(expense);
   };
 
@@ -51,10 +47,6 @@ export class ExpenseController {
     const expenseId = Number(request.params.id);
     const expenseData = request.body;
     const expense = await this.expenseService.update(expenseId, expenseData);
-    if (!expense) {
-      response.status(404).send({ error: "Expense not found" });
-      return;
-    }
     response.status(200).send(expense);
   };
 
