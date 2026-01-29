@@ -3,6 +3,7 @@ import { AuthService, JwtService } from "../services";
 import { AuthMiddleware, validateBodyMiddleware } from "../middleware";
 import { assertAuthRequest } from "../middleware/assertAuth";
 import { LoginSchema } from "../schemas";
+import { UnauthorizedError } from "../errors";
 
 export class AuthController {
   public constructor(
@@ -38,7 +39,7 @@ export class AuthController {
 
   private refresh = async (request: Request, response: Response) => {
     const refreshToken = request.cookies.refreshToken;
-    if (!refreshToken) throw new Error("Refresh token missing");
+    if (!refreshToken) throw new UnauthorizedError("Refresh token missing");
     const decoded = JwtService.verifyToken(refreshToken, "refresh");
     const accessToken = JwtService.generateAccessToken(
       decoded.userId,
